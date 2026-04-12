@@ -4,37 +4,39 @@ const startTwentyFiveButtonEl = document.getElementById("start-25-button");
 const pauseButtonEl = document.getElementById("pause-button");
 const resumeButtonEl = document.getElementById("resume-button");
 const notificationPermissionEl = document.getElementById("notification-permission");
-const audioContext = new AudioContext();
 
-let time = 0;
-let intervalId = null;
+const audioContext = new AudioContext();
+const worker = new Worker("worker.js");
 
 notificationPermissionEl.textContent = Notification.permission == "granted" ? "enabled" : "disabled";
 
+worker.addEventListener("message", (e) => {
+  display(e.data.time);
+  if (e.data.timeup) window.dispatchEvent(new CustomEvent("timeup"));
+});
+
 startFiveButtonEl.addEventListener("click", async function () {
-  time = 5 * 60;
-  display();
-  await requestNotificationPermission();
-  start();
+  const time = 5 * 60;
+  await start(time);
+  display(time);
 });
 
 startTwentyFiveButtonEl.addEventListener("click", async function () {
-  time = 25 * 60;
-  display();
-  await requestNotificationPermission();
-  start();
+  const time = 25 * 60;
+  await start(time);
+  display(time);
 });
 
 pauseButtonEl.addEventListener("click", function () {
   this.hidden = true;
   resumeButtonEl.hidden = false;
-  clearInterval(intervalId);
+  worker.postMessage({ method: "pause" });
 });
 
 resumeButtonEl.addEventListener("click", function () {
   this.hidden = true;
   pauseButtonEl.hidden = false;
-  start();
+  worker.postMessage({ method: "resume" });
 });
 
 async function requestNotificationPermission() {
@@ -42,28 +44,13 @@ async function requestNotificationPermission() {
   notificationPermissionEl.textContent = permission == "granted" ? "enabled" : "disabled";
 }
 
-function start() {
-  intervalId = setInterval(tick, 1000);
+async function start(time) {
+  await requestNotificationPermission();
   startFiveButtonEl.hidden = true;
   startTwentyFiveButtonEl.hidden = true;
   pauseButtonEl.hidden = false;
   resumeButtonEl.hidden = true;
-}
-
-function tick() {
-  --time;
-  display();
-  if (time == 0) window.dispatchEvent(new CustomEvent("timeup"));
-}
-
-function display() {
-  const min = Math.floor(time / 60)
-    .toString()
-    .padStart(2, "0");
-  const sec = Math.floor(time % 60)
-    .toString()
-    .padStart(2, "0");
-  displayEl.textContent = `${min}:${sec}`;
+  worker.postMessage({ method: "start", time: time });
 }
 
 function beep(freq, start, duration) {
@@ -83,18 +70,26 @@ function beep(freq, start, duration) {
   osc.stop(audioContext.currentTime + start + duration);
 }
 
-window.addEventListener("timeup", function () {
-  clearInterval(intervalId);
+function display(time) {
+  const min = Math.floor(time / 60);
+  const sec = Math.floor(time % 60);
+  displayEl.textContent = `${format(min)}:${format(sec)}`;
+}
 
+function format(number) {
+  return number.toString().padStart(2, "0");
+}
+
+window.addEventListener("timeup", function () {
   startFiveButtonEl.hidden = false;
   startTwentyFiveButtonEl.hidden = false;
   pauseButtonEl.hidden = true;
   resumeButtonEl.hidden = true;
 
-  beep(523, 0.0, 0.12);
-  beep(659, 0.12, 0.12);
-  beep(784, 0.24, 0.12);
-  beep(1047, 0.36, 0.6);
+  beep(523, 0.0, 0.11);
+  beep(659, 0.11, 0.11);
+  beep(784, 0.22, 0.11);
+  beep(1047, 0.33, 0.6);
 
   new Notification("Finish!");
 });
