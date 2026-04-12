@@ -1,0 +1,17 @@
+body {
+  display: flex;
+  flex-direction: column;
+  gap: 3em;
+  align-items: center;
+  background-color: #fafafa;
+}
+
+#display {
+  font-size: 3em;
+}
+
+button {
+  width: 5.5em;
+  height: 2.5em;
+  margin: 0 0.5em;
+}
