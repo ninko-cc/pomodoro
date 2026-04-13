@@ -86,6 +86,8 @@ window.addEventListener("timeup", function () {
   pauseButtonEl.hidden = true;
   resumeButtonEl.hidden = true;
 
+  displayEl.textContent = "Keep it up!";
+
   beep(523, 0.0, 0.11);
   beep(659, 0.11, 0.11);
   beep(784, 0.22, 0.11);

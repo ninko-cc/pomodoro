@@ -19,6 +19,7 @@ self.addEventListener("message", (e) => {
     if (--time == 0) {
       clearInterval(intervalId);
       self.postMessage({ time: time, timeup: true });
+      return;
     }
     self.postMessage({ time: time, timeup: false });
   }
