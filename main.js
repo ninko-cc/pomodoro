@@ -42,6 +42,7 @@ resumeButtonEl.addEventListener("click", function () {
 async function requestNotificationPermission() {
   const permission = await Notification.requestPermission();
   notificationPermissionEl.textContent = permission == "granted" ? "enabled" : "disabled";
+  style();
 }
 
 async function start(time) {
@@ -80,6 +81,12 @@ function format(number) {
   return number.toString().padStart(2, "0");
 }
 
+function style() {
+  notificationPermissionEl.textContent == "enabled"
+    ? (notificationPermissionEl.style.color = "green")
+    : (notificationPermissionEl.style.color = "darkred");
+}
+
 window.addEventListener("timeup", function () {
   startFiveButtonEl.hidden = false;
   startTwentyFiveButtonEl.hidden = false;
@@ -94,4 +101,8 @@ window.addEventListener("timeup", function () {
   beep(1047, 0.33, 0.6);
 
   new Notification("Finish!");
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  style();
 });
