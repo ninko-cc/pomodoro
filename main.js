@@ -12,18 +12,18 @@ const audioContext = new AudioContext();
 const worker = new Worker("worker.js");
 
 worker.addEventListener("message", (e) => {
-  display(e.data.time);
+  displayTime(e.data.time);
   if (e.data.timeup) timeup(e.data.initTime);
 });
 
 startFiveButtonEl.addEventListener("click", async function () {
   await start(FIVE_MIN);
-  display(FIVE_MIN);
+  displayTime(FIVE_MIN);
 });
 
 startTwentyFiveButtonEl.addEventListener("click", async function () {
   await start(TWENTY_FIVE_MIN);
-  display(TWENTY_FIVE_MIN);
+  displayTime(TWENTY_FIVE_MIN);
 });
 
 pauseButtonEl.addEventListener("click", function () {
@@ -67,7 +67,7 @@ function beep(freq, start, duration) {
   osc.stop(audioContext.currentTime + start + duration);
 }
 
-function display(time) {
+function displayTime(time) {
   const min = Math.floor(time / 60);
   const sec = Math.floor(time % 60);
   const format = (number) => number.toString().padStart(2, "0");
