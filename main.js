@@ -65,9 +65,8 @@ async function start(time) {
 }
 
 function timeup(initTime) {
-  startFiveButtonEl.hidden = startTwentyFiveButtonEl.hidden = false;
-  startFiveButtonEl.disabled = initTime == FIVE_MIN;
-  startTwentyFiveButtonEl.disabled = initTime == TWENTY_FIVE_MIN;
+  startFiveButtonEl.hidden = initTime == FIVE_MIN;
+  startTwentyFiveButtonEl.hidden = initTime == TWENTY_FIVE_MIN;
   pauseButtonEl.hidden = true;
   resumeButtonEl.hidden = true;
 
