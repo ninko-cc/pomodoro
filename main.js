@@ -75,11 +75,8 @@ function beep(freq, start, duration) {
 function display(time) {
   const min = Math.floor(time / 60);
   const sec = Math.floor(time % 60);
+  const format = (number) => number.toString().padStart(2, "0");
   displayEl.textContent = `${format(min)}:${format(sec)}`;
-}
-
-function format(number) {
-  return number.toString().padStart(2, "0");
 }
 
 function style() {
