@@ -40,7 +40,7 @@ resumeButtonEl.addEventListener("click", function () {
 
 async function start(time) {
   await Notification.requestPermission();
-  renderNotificationStatus();
+  renderNotificationPermission();
 
   startFiveButtonEl.hidden = true;
   startTwentyFiveButtonEl.hidden = true;
@@ -74,7 +74,7 @@ function displayTime(time) {
   displayEl.textContent = `${format(min)}:${format(sec)}`;
 }
 
-function renderNotificationStatus() {
+function renderNotificationPermission() {
   if (Notification.permission == "granted") {
     notificationPermissionEl.textContent = "enabled";
     notificationPermissionEl.style.color = "green";
@@ -101,5 +101,5 @@ function timeup(initTime) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  renderNotificationStatus();
+  renderNotificationPermission();
 });
