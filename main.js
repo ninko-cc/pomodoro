@@ -11,8 +11,6 @@ const notificationPermissionEl = document.getElementById("notification-permissio
 const audioContext = new AudioContext();
 const worker = new Worker("worker.js");
 
-notificationPermissionEl.textContent = Notification.permission == "granted" ? "enabled" : "disabled";
-
 worker.addEventListener("message", (e) => {
   display(e.data.time);
   if (e.data.timeup) timeup(e.data.initTime);
@@ -40,18 +38,15 @@ resumeButtonEl.addEventListener("click", function () {
   worker.postMessage({ method: "resume" });
 });
 
-async function requestNotificationPermission() {
-  const permission = await Notification.requestPermission();
-  notificationPermissionEl.textContent = permission == "granted" ? "enabled" : "disabled";
-  style();
-}
-
 async function start(time) {
-  await requestNotificationPermission();
+  await Notification.requestPermission();
+  renderNotificationStatus();
+
   startFiveButtonEl.hidden = true;
   startTwentyFiveButtonEl.hidden = true;
   pauseButtonEl.hidden = false;
   resumeButtonEl.hidden = true;
+
   worker.postMessage({ method: "start", time: time });
 }
 
@@ -79,10 +74,14 @@ function display(time) {
   displayEl.textContent = `${format(min)}:${format(sec)}`;
 }
 
-function style() {
-  notificationPermissionEl.textContent == "enabled"
-    ? (notificationPermissionEl.style.color = "green")
-    : (notificationPermissionEl.style.color = "darkred");
+function renderNotificationStatus() {
+  if (Notification.permission == "granted") {
+    notificationPermissionEl.textContent = "enabled";
+    notificationPermissionEl.style.color = "green";
+  } else {
+    notificationPermissionEl.textContent = "disabled";
+    notificationPermissionEl.style.color = "darkred";
+  }
 }
 
 function timeup(initTime) {
@@ -102,5 +101,5 @@ function timeup(initTime) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  style();
+  renderNotificationStatus();
 });
