@@ -11,6 +11,10 @@ const notificationPermissionEl = document.getElementById("notification-permissio
 const audioContext = new AudioContext();
 const worker = new Worker("worker.js");
 
+document.addEventListener("DOMContentLoaded", () => {
+  renderNotificationPermission();
+});
+
 worker.addEventListener("message", (e) => {
   displayTime(e.data.time);
   if (e.data.timeup) timeup(e.data.initTime);
@@ -38,6 +42,16 @@ resumeButtonEl.addEventListener("click", function () {
   worker.postMessage({ method: "resume" });
 });
 
+function renderNotificationPermission() {
+  if (Notification.permission == "granted") {
+    notificationPermissionEl.textContent = "enabled";
+    notificationPermissionEl.style.color = "green";
+  } else {
+    notificationPermissionEl.textContent = "disabled";
+    notificationPermissionEl.style.color = "darkred";
+  }
+}
+
 async function start(time) {
   await Notification.requestPermission();
   renderNotificationPermission();
@@ -48,6 +62,22 @@ async function start(time) {
   resumeButtonEl.hidden = true;
 
   worker.postMessage({ method: "start", time: time });
+}
+
+function timeup(initTime) {
+  startFiveButtonEl.hidden = initTime == FIVE_MIN;
+  startTwentyFiveButtonEl.hidden = initTime == TWENTY_FIVE_MIN;
+  pauseButtonEl.hidden = true;
+  resumeButtonEl.hidden = true;
+
+  displayEl.textContent = "Keep it up!";
+
+  beep(523, 0.0, 0.11);
+  beep(659, 0.11, 0.11);
+  beep(784, 0.22, 0.11);
+  beep(1047, 0.33, 0.6);
+
+  new Notification("Finish!");
 }
 
 function beep(freq, start, duration) {
@@ -73,33 +103,3 @@ function displayTime(time) {
   const format = (number) => number.toString().padStart(2, "0");
   displayEl.textContent = `${format(min)}:${format(sec)}`;
 }
-
-function renderNotificationPermission() {
-  if (Notification.permission == "granted") {
-    notificationPermissionEl.textContent = "enabled";
-    notificationPermissionEl.style.color = "green";
-  } else {
-    notificationPermissionEl.textContent = "disabled";
-    notificationPermissionEl.style.color = "darkred";
-  }
-}
-
-function timeup(initTime) {
-  startFiveButtonEl.hidden = initTime == FIVE_MIN;
-  startTwentyFiveButtonEl.hidden = initTime == TWENTY_FIVE_MIN;
-  pauseButtonEl.hidden = true;
-  resumeButtonEl.hidden = true;
-
-  displayEl.textContent = "Keep it up!";
-
-  beep(523, 0.0, 0.11);
-  beep(659, 0.11, 0.11);
-  beep(784, 0.22, 0.11);
-  beep(1047, 0.33, 0.6);
-
-  new Notification("Finish!");
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  renderNotificationPermission();
-});
