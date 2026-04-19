@@ -1,3 +1,6 @@
+const TWENTY_FIVE_MIN = 25 * 60;
+const FIVE_MIN = 5 * 60;
+
 const displayEl = document.getElementById("display");
 const startFiveButtonEl = document.getElementById("start-5-button");
 const startTwentyFiveButtonEl = document.getElementById("start-25-button");
@@ -12,19 +15,17 @@ notificationPermissionEl.textContent = Notification.permission == "granted" ? "e
 
 worker.addEventListener("message", (e) => {
   display(e.data.time);
-  if (e.data.timeup) window.dispatchEvent(new CustomEvent("timeup"));
+  if (e.data.timeup) timeup(e.data.initTime);
 });
 
 startFiveButtonEl.addEventListener("click", async function () {
-  const time = 5 * 60;
-  await start(time);
-  display(time);
+  await start(FIVE_MIN);
+  display(FIVE_MIN);
 });
 
 startTwentyFiveButtonEl.addEventListener("click", async function () {
-  const time = 25 * 60;
-  await start(time);
-  display(time);
+  await start(TWENTY_FIVE_MIN);
+  display(TWENTY_FIVE_MIN);
 });
 
 pauseButtonEl.addEventListener("click", function () {
@@ -87,9 +88,9 @@ function style() {
     : (notificationPermissionEl.style.color = "darkred");
 }
 
-window.addEventListener("timeup", function () {
-  startFiveButtonEl.hidden = false;
-  startTwentyFiveButtonEl.hidden = false;
+function timeup(initTime) {
+  startFiveButtonEl.hidden = initTime == FIVE_MIN;
+  startTwentyFiveButtonEl.hidden = initTime == TWENTY_FIVE_MIN;
   pauseButtonEl.hidden = true;
   resumeButtonEl.hidden = true;
 
@@ -101,7 +102,7 @@ window.addEventListener("timeup", function () {
   beep(1047, 0.33, 0.6);
 
   new Notification("Finish!");
-});
+}
 
 document.addEventListener("DOMContentLoaded", () => {
   style();

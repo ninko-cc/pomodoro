@@ -1,10 +1,11 @@
 let intervalId = null;
+let initTime = 0;
 let time = 0;
 
 self.addEventListener("message", (e) => {
   switch (e.data.method) {
     case "start":
-      time = e.data.time;
+      time = initTime = e.data.time;
       intervalId = setInterval(tick, 1000);
       break;
     case "pause":
@@ -18,9 +19,9 @@ self.addEventListener("message", (e) => {
   function tick() {
     if (--time == 0) {
       clearInterval(intervalId);
-      self.postMessage({ time: time, timeup: true });
+      self.postMessage({ time, initTime: initTime, timeup: true });
       return;
     }
-    self.postMessage({ time: time, timeup: false });
+    self.postMessage({ time, initTime, timeup: false });
   }
 });
